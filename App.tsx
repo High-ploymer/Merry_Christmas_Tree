@@ -80,6 +80,13 @@ export default function App() {
 
         console.log(`Generated ${photoUrls.length} photo URLs`);
         console.log('First few URLs:', photoUrls.slice(0, 3));
+
+        // Test if images can be loaded
+        const testImage = new Image();
+        testImage.onload = () => console.log('✅ Test image loaded successfully');
+        testImage.onerror = () => console.log('❌ Test image failed to load');
+        testImage.src = photoUrls[0];
+
         setUploadedPhotos(photoUrls);
       } catch (error) {
         console.error('Error setting up photos:', error);

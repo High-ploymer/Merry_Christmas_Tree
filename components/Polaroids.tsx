@@ -57,7 +57,12 @@ const PolaroidItem: React.FC<{ data: PhotoData; mode: TreeMode; index: number }>
       },
       undefined, // onProgress
       (err) => {
-        console.error(`Failed to load image: ${data.url}`, err);
+        console.error(`❌ Failed to load image: ${data.url}`, err);
+        console.error('Error details:', {
+          message: err?.message,
+          type: err?.type,
+          target: err?.target?.src
+        });
         setError(true);
       }
     );
