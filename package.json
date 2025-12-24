@@ -9,6 +9,7 @@
     "dev:vercel": "vercel dev",
     "build": "vite build",
     "preview": "vite preview",
+    "deploy": "./deploy.sh",
     "download-model": "node scripts/download-model.js",
     "postinstall": "npm run download-model"
   },

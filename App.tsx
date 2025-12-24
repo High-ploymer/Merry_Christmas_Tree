@@ -67,37 +67,28 @@ export default function App() {
       setIsLoadingShare(true);
 
       try {
-        // Try to load photos from public/photos directory
-        // We'll try common photo names: photo1.jpg, photo2.jpg, etc.
+        // Directly generate photo URLs without checking existence
+        // This avoids CORS issues with fetch in production
         const photoUrls: string[] = [];
-        const maxPhotos = 22; // Maximum number of photos to try loading
+        const maxPhotos = 22; // Maximum number of photos
 
         for (let i = 1; i <= maxPhotos; i++) {
-          // Try different extensions
-          const extensions = ['jpg', 'jpeg', 'png', 'JPG', 'JPEG', 'PNG'];
-
-          for (const ext of extensions) {
-            const photoPath = `/photos/photo${i}.${ext}`;
-
-            try {
-              // Check if the photo exists by trying to fetch it
-              const response = await fetch(photoPath, { method: 'HEAD' });
-              if (response.ok) {
-                photoUrls.push(photoPath);
-                break; // Found the photo, move to next number
-              }
-            } catch {
-              // Photo doesn't exist, continue to next extension
-            }
-          }
+          // Assume photos exist as photo1.jpg, photo2.jpg, etc.
+          const photoPath = `/photos/photo${i}.jpg`;
+          photoUrls.push(photoPath);
         }
 
-        if (photoUrls.length > 0) {
-          console.log(`Loaded ${photoUrls.length} photos from directory`);
-          setUploadedPhotos(photoUrls);
-        } else {
-          console.log('No photos found in /photos directory');
-        }
+        console.log(`Generated ${photoUrls.length} photo URLs`);
+        setUploadedPhotos(photoUrls);
+      } catch (error) {
+        console.error('Error setting up photos:', error);
+      } finally {
+        setIsLoadingShare(false);
+      }
+    };
+
+    loadPhotosFromDirectory();
+  }, []);
       } catch (error) {
         console.error('Error loading photos from directory:', error);
       } finally {
