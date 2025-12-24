@@ -264,13 +264,15 @@ export default function App() {
           </button>
           
           {/* Photo container */}
-          <div className="relative z-50 max-w-4xl max-h-[90vh] pointer-events-auto">
-            <img 
-              src={selectedPhoto} 
-              alt="Viewed Photo" 
-              className="max-w-full max-h-full object-contain shadow-2xl"
-              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking on image
-            />
+          <div className="relative z-50 w-full h-full flex items-center justify-center pointer-events-auto p-8">
+            <div className="max-w-[98vw] max-h-[95vh] flex items-center justify-center">
+              <img
+                src={selectedPhoto}
+                alt="Viewed Photo"
+                className="max-w-full max-h-full object-contain shadow-2xl rounded-lg border-4 border-white/20"
+                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking on image
+              />
+            </div>
           </div>
         </div>
       )}
