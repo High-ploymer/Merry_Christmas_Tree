@@ -241,7 +241,7 @@ export default function App() {
               
               {/* Text label */}
               <div className="text-center mt-4 font-serif text-gray-700 text-lg">
-                回忆萦绕心头
+                回忆上了发条
               </div>
             </div>
           </div>
