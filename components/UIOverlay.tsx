@@ -15,6 +15,31 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({ isFireworksActive = false 
 
   return (
     <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-10">
+      <style>{`
+        @keyframes giftBoxEntrance {
+          0% {
+            transform: scale(0) rotate(-180deg);
+            opacity: 0;
+          }
+          50% {
+            transform: scale(1.2) rotate(-90deg);
+            opacity: 0.7;
+          }
+          100% {
+            transform: scale(1) rotate(0deg);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes gentleFloat {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-5px);
+          }
+        }
+      `}</style>
 
       {/* Header */}
       <header className="absolute top-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
@@ -61,6 +86,22 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({ isFireworksActive = false 
             </p>
           </div>
 
+          <h2 className="text-base font-serif text-[#D4AF37] mb-2 mt-4 tracking-wide">鼠标和触摸控制说明</h2>
+          <div className="space-y-1.5 text-[#F5E6BF] font-serif text-xs leading-relaxed">
+            <p className="flex items-start gap-2">
+              <span className="text-[#D4AF37] shrink-0 text-sm">✦</span>
+              <span>使用鼠标拖拽或触摸滑动来旋转圣诞树视角</span>
+            </p>
+            <p className="flex items-start gap-2">
+              <span className="text-[#D4AF37] shrink-0 text-sm">✦</span>
+              <span>点击照片查看大图显示</span>
+            </p>
+            <p className="flex items-start gap-2">
+              <span className="text-[#D4AF37] shrink-0 text-sm">✦</span>
+              <span>点击右下角的礼物盒按钮开启惊喜模式</span>
+            </p>
+          </div>
+
           <h2 className="text-base font-serif text-[#D4AF37] mb-2 mt-4 tracking-wide">烟花观看操作说明</h2>
           <div className="space-y-1.5 text-[#F5E6BF] font-serif text-xs leading-relaxed">
             <p className="flex items-start gap-2">
@@ -80,10 +121,25 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({ isFireworksActive = false 
 
       </div>
 
-      {/* Decorative Corners */}
-      <div className="absolute top-8 left-8 w-16 h-16 border-t-2 border-l-2 border-[#D4AF37] opacity-50"></div>
-      <div className="absolute top-8 right-8 w-16 h-16 border-t-2 border-r-2 border-[#D4AF37] opacity-50"></div>
-      <div className="absolute bottom-8 right-8 w-16 h-16 border-b-2 border-r-2 border-[#D4AF37] opacity-50"></div>
+      {/* Gift Box Button - Bottom Right */}
+      <div className="absolute bottom-8 right-8 pointer-events-auto">
+        <button
+          className="group relative w-20 h-20 bg-gradient-to-br from-[#D4AF37] to-[#B8860B] border-2 border-[#F5E6BF] shadow-lg hover:shadow-[0_0_30px_#D4AF37] transition-all duration-500 hover:scale-110 animate-pulse"
+          style={{
+            animation: 'giftBoxEntrance 2s ease-out forwards, gentleFloat 3s ease-in-out infinite 2s'
+          }}
+          aria-label="打开礼物盒"
+        >
+          {/* Gift Box Icon */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-3xl transform group-hover:scale-125 transition-transform duration-300">🎁</span>
+          </div>
+          
+          {/* Sparkle Effects */}
+          <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#F5E6BF] rounded-full animate-ping opacity-75"></div>
+          <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-[#D4AF37] rounded-full animate-pulse opacity-60"></div>
+        </button>
+      </div>
     </div>
   );
 };

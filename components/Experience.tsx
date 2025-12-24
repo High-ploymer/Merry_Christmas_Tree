@@ -1,9 +1,9 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { Environment, OrbitControls, ContactShadows } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette, Noise } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { Foliage } from './Foliage';
 import { Ornaments } from './Ornaments';
 import { Polaroids } from './Polaroids';
@@ -16,6 +16,7 @@ interface ExperienceProps {
   uploadedPhotos: string[];
   twoHandsDetected: boolean;
   onClosestPhotoChange?: (photoUrl: string | null) => void;
+  onPhotoClick?: (photoUrl: string) => void;
   zoomLevel?: number;
 }
 
@@ -25,9 +26,51 @@ export const Experience: React.FC<ExperienceProps> = ({
   uploadedPhotos,
   twoHandsDetected,
   onClosestPhotoChange,
+  onPhotoClick,
   zoomLevel = 29
 }) => {
   const controlsRef = useRef<any>(null);
+  const { gl } = useThree();
+  const [isDragging, setIsDragging] = useState(false);
+  const [lastMouseX, setLastMouseX] = useState(0);
+  const [manualAzimuth, setManualAzimuth] = useState(0);
+
+  // Mouse/Touch controls for manual rotation
+  const handlePointerDown = useCallback((event: PointerEvent) => {
+    setIsDragging(true);
+    setLastMouseX(event.clientX);
+  }, []);
+
+  const handlePointerMove = useCallback((event: PointerEvent) => {
+    if (!isDragging || !controlsRef.current) return;
+
+    const deltaX = event.clientX - lastMouseX;
+    const rotationSpeed = 0.01;
+    const newAzimuth = manualAzimuth - deltaX * rotationSpeed;
+
+    setManualAzimuth(newAzimuth);
+    setLastMouseX(event.clientX);
+  }, [isDragging, lastMouseX, manualAzimuth]);
+
+  const handlePointerUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  // Add event listeners
+  React.useEffect(() => {
+    const canvas = gl.domElement;
+    canvas.addEventListener('pointerdown', handlePointerDown);
+    canvas.addEventListener('pointermove', handlePointerMove);
+    canvas.addEventListener('pointerup', handlePointerUp);
+    canvas.addEventListener('pointerleave', handlePointerUp);
+
+    return () => {
+      canvas.removeEventListener('pointerdown', handlePointerDown);
+      canvas.removeEventListener('pointermove', handlePointerMove);
+      canvas.removeEventListener('pointerup', handlePointerUp);
+      canvas.removeEventListener('pointerleave', handlePointerUp);
+    };
+  }, [gl.domElement, handlePointerDown, handlePointerMove, handlePointerUp]);
 
   // Update camera rotation and zoom based on hand position
   useFrame((_, delta) => {
@@ -131,7 +174,7 @@ export const Experience: React.FC<ExperienceProps> = ({
       <group position={[0, -5, 0]}>
         <Foliage mode={mode} count={12000} />
         <Ornaments mode={mode} count={600} />
-        <Polaroids mode={mode} uploadedPhotos={uploadedPhotos} twoHandsDetected={twoHandsDetected} onClosestPhotoChange={onClosestPhotoChange} />
+        <Polaroids mode={mode} uploadedPhotos={uploadedPhotos} twoHandsDetected={twoHandsDetected} onClosestPhotoChange={onClosestPhotoChange} onPhotoClick={onPhotoClick} />
         <TreeStar mode={mode} />
         
         {/* Floor Reflections */}

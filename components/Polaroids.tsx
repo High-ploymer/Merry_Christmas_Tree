@@ -29,6 +29,7 @@ interface PolaroidsProps {
   uploadedPhotos: string[];
   twoHandsDetected: boolean;
   onClosestPhotoChange?: (photoUrl: string | null) => void;
+  onPhotoClick?: (photoUrl: string) => void;
 }
 
 interface PhotoData {
@@ -39,10 +40,11 @@ interface PhotoData {
   speed: number;
 }
 
-const PolaroidItem: React.FC<{ data: PhotoData; mode: TreeMode; index: number }> = ({ data, mode, index }) => {
+const PolaroidItem: React.FC<{ data: PhotoData; mode: TreeMode; index: number; onClick?: (photoUrl: string) => void }> = ({ data, mode, index, onClick }) => {
   const groupRef = useRef<THREE.Group>(null);
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
   const [error, setError] = useState(false);
+  const [imageAspect, setImageAspect] = useState(1); // width/height ratio
 
   // Safe texture loading that won't crash the app if a file is missing
   useEffect(() => {
@@ -52,6 +54,11 @@ const PolaroidItem: React.FC<{ data: PhotoData; mode: TreeMode; index: number }>
       (loadedTex) => {
         console.log(`Successfully loaded image: ${data.url}`);
         loadedTex.colorSpace = THREE.SRGBColorSpace;
+        
+        // Calculate aspect ratio
+        const aspect = loadedTex.image.width / loadedTex.image.height;
+        setImageAspect(aspect);
+        
         setTexture(loadedTex);
         setError(false);
       },
@@ -153,8 +160,16 @@ const PolaroidItem: React.FC<{ data: PhotoData; mode: TreeMode; index: number }>
         </mesh>
 
         {/* The Photo Area */}
-        <mesh position={[0, 0.15, 0.025]}>
-          <planeGeometry args={[1.0, 1.0]} />
+        <mesh 
+          position={[0, 0.15, 0.025]}
+          onClick={() => onClick && onClick(data.url)}
+          onPointerOver={() => document.body.style.cursor = 'pointer'}
+          onPointerOut={() => document.body.style.cursor = 'auto'}
+        >
+          <planeGeometry args={[
+            Math.min(imageAspect, 1.0) * 1.0, // width: constrain to max 1.0
+            Math.min(1.0 / imageAspect, 1.0) * 1.0 // height: constrain to max 1.0
+          ]} />
           {texture && !error ? (
             <meshBasicMaterial map={texture} />
           ) : (
@@ -184,7 +199,7 @@ const PolaroidItem: React.FC<{ data: PhotoData; mode: TreeMode; index: number }>
   );
 };
 
-export const Polaroids: React.FC<PolaroidsProps> = ({ mode, uploadedPhotos, twoHandsDetected, onClosestPhotoChange }) => {
+export const Polaroids: React.FC<PolaroidsProps> = ({ mode, uploadedPhotos, twoHandsDetected, onClosestPhotoChange, onPhotoClick }) => {
   const groupRef = useRef<THREE.Group>(null);
   const [closestPhotoIndex, setClosestPhotoIndex] = React.useState<number>(0);
 
@@ -290,6 +305,7 @@ export const Polaroids: React.FC<PolaroidsProps> = ({ mode, uploadedPhotos, twoH
           index={i} 
           data={data} 
           mode={mode}
+          onClick={onPhotoClick}
         />
       ))}
     </group>

@@ -60,6 +60,7 @@ export default function App() {
   const [isFireworksActive, setIsFireworksActive] = useState(false);
   const [lockMode, setLockMode] = useState(false); // Lock mode during fireworks
   const [isGiftBoxOpen, setIsGiftBoxOpen] = useState(false); // Gift box state
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null); // For click-to-view photos
 
   // Load photos from public/photos directory on mount
   useEffect(() => {
@@ -114,6 +115,14 @@ export default function App() {
     setClosestPhoto(photoUrl);
   };
 
+  const handlePhotoClick = (photoUrl: string) => {
+    setSelectedPhoto(photoUrl);
+  };
+
+  const handleClosePhotoView = () => {
+    setSelectedPhoto(null);
+  };
+
   const handlePhotosUpload = (photos: string[]) => {
     setUploadedPhotos(photos);
   };
@@ -148,6 +157,7 @@ export default function App() {
               uploadedPhotos={uploadedPhotos}
               twoHandsDetected={twoHandsDetected}
               onClosestPhotoChange={handleClosestPhotoChange}
+              onPhotoClick={handlePhotoClick}
               zoomLevel={zoomLevel}
             />
           </Suspense>
@@ -234,6 +244,33 @@ export default function App() {
                 回忆萦绕心头
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Click-to-View Photo Overlay */}
+      {selectedPhoto && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center animate-fade-in" onClick={handleClosePhotoView}>
+          {/* Semi-transparent backdrop */}
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer"></div>
+          
+          {/* Close button */}
+          <button
+            onClick={handleClosePhotoView}
+            className="absolute top-8 right-8 z-60 w-12 h-12 bg-black/50 hover:bg-black/70 border border-[#D4AF37] text-[#D4AF37] hover:text-white transition-all duration-300 flex items-center justify-center pointer-events-auto"
+            aria-label="关闭照片查看"
+          >
+            ✕
+          </button>
+          
+          {/* Photo container */}
+          <div className="relative z-50 max-w-4xl max-h-[90vh] pointer-events-auto">
+            <img 
+              src={selectedPhoto} 
+              alt="Viewed Photo" 
+              className="max-w-full max-h-full object-contain shadow-2xl"
+              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking on image
+            />
           </div>
         </div>
       )}
