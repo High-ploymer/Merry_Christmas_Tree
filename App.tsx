@@ -79,18 +79,10 @@ export default function App() {
         }
 
         console.log(`Generated ${photoUrls.length} photo URLs`);
+        console.log('First few URLs:', photoUrls.slice(0, 3));
         setUploadedPhotos(photoUrls);
       } catch (error) {
         console.error('Error setting up photos:', error);
-      } finally {
-        setIsLoadingShare(false);
-      }
-    };
-
-    loadPhotosFromDirectory();
-  }, []);
-      } catch (error) {
-        console.error('Error loading photos from directory:', error);
       } finally {
         setIsLoadingShare(false);
       }
